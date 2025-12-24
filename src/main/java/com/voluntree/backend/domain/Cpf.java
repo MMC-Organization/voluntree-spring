@@ -7,10 +7,6 @@ public class Cpf {
 
   private String cpf;
 
-  protected Cpf() {
-
-  }
-
   public Cpf(String cpf) {
     if (cpf == null) {
       throw new IllegalArgumentException("Cpf não pode ser nulo!");

@@ -1,4 +1,6 @@
-package com.voluntree.backend.domain;
+package com.voluntree.backend.domain.volunteer;
+
+import com.voluntree.backend.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

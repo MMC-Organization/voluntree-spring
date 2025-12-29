@@ -9,9 +9,9 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("VOLUNTEER")
-public class Volunter extends User {
+public class Volunteer extends User {
 
   @Convert(converter = CpfConverter.class)
-  @Column(columnDefinition = "CHAR(11)")
+  @Column(length = 11)
   private Cpf cpf;
 }

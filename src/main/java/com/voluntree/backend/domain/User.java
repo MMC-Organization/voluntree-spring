@@ -15,9 +15,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// criar migration com check para validar que volunteer tenha cpf e organization tenha cnpj
+// TODO: criar migration com check para validar que volunteer tenha cpf e organization tenha cnpj
+// TODO: criar migration com index no cpf ou cnpj de acordo com o user_type
 
-@Table(name = "user")
+@Table(name = "users")
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)

@@ -12,7 +12,7 @@ import jakarta.persistence.Entity;
 public class Organization extends User {
 
   @Convert(converter = CnpjConverter.class)
-  @Column(columnDefinition = "CHAR(14)")
+  @Column(length = 14)
   private Cnpj cnpj;
 
   @Column(name = "company_name")

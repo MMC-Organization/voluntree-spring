@@ -8,6 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.voluntree.backend.domain.organization.Organization;
+import com.voluntree.backend.domain.volunteer.Volunter;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

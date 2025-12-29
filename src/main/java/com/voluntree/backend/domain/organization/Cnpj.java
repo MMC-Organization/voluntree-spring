@@ -1,4 +1,4 @@
-package com.voluntree.backend.domain;
+package com.voluntree.backend.domain.organization;
 
 import java.util.List;
 import java.util.stream.Stream;

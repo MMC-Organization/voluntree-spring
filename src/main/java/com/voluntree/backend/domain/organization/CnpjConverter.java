@@ -1,4 +1,4 @@
-package com.voluntree.backend.domain;
+package com.voluntree.backend.domain.organization;
 
 import jakarta.persistence.AttributeConverter;
 

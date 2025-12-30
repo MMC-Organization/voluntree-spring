@@ -37,5 +37,5 @@ public class Registration {
 
   @CreationTimestamp
   @Column(updatable = false, insertable = false)
-  LocalDateTime registeredAt;
+  private LocalDateTime registeredAt;
 }

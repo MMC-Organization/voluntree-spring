@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Module;
+import com.voluntree.backend.enums.Outcome;
 import com.voluntree.backend.enums.UserType;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,9 @@ public class Log {
 
   @Column(nullable = false, updatable = false)
   private ActionType actionType;
+
+  @Column(nullable = false, updatable = false)
+  private Outcome outcome;
 
   @Column(nullable = false, updatable = false)
   private Module module;

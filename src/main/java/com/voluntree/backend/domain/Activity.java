@@ -1,6 +1,6 @@
 package com.voluntree.backend.domain;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.voluntree.backend.domain.organization.Organization;
 
@@ -19,23 +19,23 @@ public class Activity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 200)
   private String name;
 
   @Column
   private String description;
 
-  @Column(nullable = false)
-  private Integer spots;
+  @Column
+  private Short spots;
 
   @Column(nullable = false, length = 8)
   private String cep;
 
-  @Column
-  private Integer number;
+  @Column(length = 10)
+  private String number;
 
   @Column(nullable = false)
-  private Date date;
+  private LocalDateTime activityDate;
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "organization_id", nullable = false)

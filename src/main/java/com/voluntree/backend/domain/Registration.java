@@ -1,8 +1,6 @@
 package com.voluntree.backend.domain;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
+import java.time.Instant;
 
 import com.voluntree.backend.domain.volunteer.Volunteer;
 
@@ -15,12 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "volunteer_id", "activity_id" })
-})
+@Table
 public class Registration {
 
   @Id
@@ -28,14 +23,13 @@ public class Registration {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "volunteer_id")
+  @JoinColumn(name = "volunteer_id", nullable = false)
   private Volunteer volunteer;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "activity_id")
+  @JoinColumn(name = "activity_id", nullable = false)
   private Activity activity;
 
-  @CreationTimestamp
-  @Column(updatable = false, insertable = false)
-  private LocalDateTime registeredAt;
+  @Column(insertable = false)
+  private Instant registeredAt;
 }

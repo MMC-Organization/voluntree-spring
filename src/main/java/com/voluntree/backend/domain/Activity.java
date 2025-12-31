@@ -40,4 +40,7 @@ public class Activity {
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "organization_id", nullable = false)
   private Organization organization;
+
+  @Column
+  private Boolean canceled;
 }

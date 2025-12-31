@@ -32,4 +32,7 @@ public class Registration {
 
   @Column(insertable = false)
   private Instant registeredAt;
+
+  @Column
+  private Boolean canceled;  
 }

@@ -45,6 +45,7 @@ CREATE TABLE
     number VARCHAR(10),
     activity_date TIMESTAMP NOT NULL,
     organization_id BIGINT NOT NULL,
+    canceled BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT fk_activity_organization_id FOREIGN KEY (organization_id) REFERENCES users (id),
     CONSTRAINT unq_activity_name_org_date UNIQUE (organization_id, activity_date, name, cep, number),
     CONSTRAINT chk_spots CHECK (
@@ -59,6 +60,7 @@ CREATE TABLE
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     volunteer_id BIGINT NOT NULL,
     activity_id BIGINT NOT NULL,
+    canceled BOOLEAN NOT NULL DEFAULT FALSE,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT fk_registration_activity_id FOREIGN KEY (activity_id) REFERENCES activity (id),
     CONSTRAINT fk_registration_volunteer_id FOREIGN KEY (volunteer_id) REFERENCES users (id),
@@ -71,6 +73,7 @@ CREATE TABLE
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     message TEXT NOT NULL,
     user_id BIGINT NOT NULL,
+    affected_resource_id BIGINT,
     user_type VARCHAR(30) NOT NULL,
     action_type VARCHAR(30) NOT NULL,
     outcome VARCHAR(20) NOT NULL,

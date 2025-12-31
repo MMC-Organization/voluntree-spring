@@ -31,6 +31,9 @@ public class Log {
   @Column(nullable = false, updatable = false)
   private Long userId;
 
+  @Column(updatable = false)
+  private Long affectedResourceId;
+
   @Column(nullable = false, updatable = false, length = 30)
   private UserType userType;
 

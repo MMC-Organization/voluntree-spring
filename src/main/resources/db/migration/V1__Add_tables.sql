@@ -46,7 +46,11 @@ CREATE TABLE
     activity_date TIMESTAMP NOT NULL,
     organization_id BIGINT NOT NULL,
     CONSTRAINT fk_activity_organization_id FOREIGN KEY (organization_id) REFERENCES users (id),
-    CONSTRAINT unq_activity_name_org_date UNIQUE (organization_id, activity_date, name, cep, number)
+    CONSTRAINT unq_activity_name_org_date UNIQUE (organization_id, activity_date, name, cep, number),
+    CONSTRAINT chk_spots CHECK (
+      (spots IS NULL)
+      OR (spots > 0)
+    )
   );
 
 -- apenas volunteer pode se inscrever em atividade
@@ -88,3 +92,5 @@ CREATE TABLE
       module in ('AUTH', 'PROFILE', 'ACTIVITY', 'REGISTRATION')
     )
   );
+
+CREATE INDEX idx_registration_activity ON registration (activity_id);

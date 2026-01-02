@@ -23,3 +23,23 @@ $$ language plpgsql;
 CREATE
 OR REPLACE TRIGGER vrf_registration_creator_and_spots BEFORE INSERT ON registration FOR EACH ROW
 EXECUTE FUNCTION vrf_registration_creator_and_spots ();
+
+CREATE
+OR REPLACE FUNCTION registration_logical_delete () RETURNS TRIGGER AS $$
+BEGIN
+  IF NOT OLD.canceled THEN
+    UPDATE registration SET canceled = TRUE WHERE id = OLD.id;
+  END IF;
+
+  RETURN NULL;
+END;
+$$ language plpgsql;
+
+CREATE
+OR REPLACE TRIGGER registration_logical_delete_trg BEFORE DELETE ON registration FOR EACH ROW
+EXECUTE FUNCTION registration_logical_delete ();
+
+/* 
+  uma inscrição só pode ser CRIADA por um VOLUNTÁRIO [x]
+  uma inscrição não pode ser DELETADA de verdade apenas logicamente [ ]
+*/

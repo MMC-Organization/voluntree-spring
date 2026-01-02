@@ -20,7 +20,8 @@ public class AuditEventListener {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   @EventListener
   public void onAuditEvent(AuditEvent event) {
-    Log log = new Log(null, null, event.message(), event.userId(), event.userType(), event.actionType(),
+    Log log = new Log(null, null, event.message(), event.userId(), event.affectedResourceId(), event.userType(),
+        event.actionType(),
         event.outcome(), event.module());
 
     repo.save(log);

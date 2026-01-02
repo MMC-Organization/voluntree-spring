@@ -6,6 +6,7 @@ public enum ActionType {
   CREATE("CREATE"),
   UPDATE("UPDATE"),
   DELETE("DELETE"),
+  READ("READ"),
   SIGNIN("SIGNIN"),
   SIGNOUT("SIGNOUT"),
   ERROR("ERROR");

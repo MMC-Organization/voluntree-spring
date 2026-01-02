@@ -1,8 +1,6 @@
 package com.voluntree.backend.domain;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
+import java.time.Instant;
 
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Module;
@@ -24,9 +22,8 @@ public class Log {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @CreationTimestamp
-  @Column(updatable = false)
-  private LocalDateTime createdAt;
+  @Column(updatable = false, insertable = false,  nullable = false)
+  private Instant createdAt;
 
   @Column(nullable = false, updatable = false)
   private String message;
@@ -34,15 +31,18 @@ public class Log {
   @Column(nullable = false, updatable = false)
   private Long userId;
 
-  @Column(nullable = false, updatable = false)
+  @Column(updatable = false)
+  private Long affectedResourceId;
+
+  @Column(nullable = false, updatable = false, length = 30)
   private UserType userType;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, length = 30)
   private ActionType actionType;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, length = 20)
   private Outcome outcome;
 
-  @Column(nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false, length = 20)
   private Module module;
 }

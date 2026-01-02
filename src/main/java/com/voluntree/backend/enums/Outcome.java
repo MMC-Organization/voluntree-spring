@@ -3,7 +3,7 @@ package com.voluntree.backend.enums;
 import java.util.stream.Stream;
 
 public enum Outcome {
-  ATTEMP("ATTEMP"),
+  ATTEMP("ATTEMPT"),
   SUCESS("SUCESS"),
   FAIL("FAIL");
 

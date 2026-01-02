@@ -15,9 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// TODO: criar migration com check para validar que volunteer tenha cpf e organization tenha cnpj
-// TODO: criar migration com index no cpf ou cnpj de acordo com o user_type
-
 @Table(name = "users")
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -32,21 +29,21 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 150)
   private String name;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 8)
   private String cep;
 
-  @Column(nullable = false)
+  @Column(length = 10)
   private String number;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 255)
   private String email;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String password;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 25)
   private String phoneNumber;
 }

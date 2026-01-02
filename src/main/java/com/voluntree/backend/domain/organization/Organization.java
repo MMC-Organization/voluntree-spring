@@ -15,9 +15,9 @@ public class Organization extends User {
   @Column(length = 14)
   private Cnpj cnpj;
 
-  @Column(name = "company_name")
+  @Column(length = 255)
   private String companyName;
 
-  @Column(columnDefinition = "TEXT")
+  @Column
   private String cause;
 }

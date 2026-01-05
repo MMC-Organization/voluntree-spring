@@ -6,9 +6,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("ORGANIZATION")
+@Getter
+@Setter
 public class Organization extends User {
 
   @Convert(converter = CnpjConverter.class)

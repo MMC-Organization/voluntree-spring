@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +23,8 @@ public class SecurityConfig {
     http.csrf(csrf -> csrf
         .ignoringRequestMatchers("/api/auth/**", "/error"))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/error").permitAll()
+            .requestMatchers("/api/auth/login", "/api/auth/signup").anonymous()
+            .requestMatchers("/error").permitAll()
             .anyRequest().authenticated())
         .formLogin(form -> form.disable());
 
@@ -39,5 +42,10 @@ public class SecurityConfig {
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  SecurityContextRepository securityContextRepository() {
+    return new HttpSessionSecurityContextRepository();
   }
 }

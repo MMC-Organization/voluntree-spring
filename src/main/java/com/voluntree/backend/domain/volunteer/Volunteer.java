@@ -6,9 +6,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("VOLUNTEER")
+@NoArgsConstructor
+@Setter
 public class Volunteer extends User {
 
   @Convert(converter = CpfConverter.class)

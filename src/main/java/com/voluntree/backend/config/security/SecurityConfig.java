@@ -13,6 +13,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -21,11 +27,20 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf
-        .ignoringRequestMatchers("/api/auth/**", "/error"))
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler() {
+          @Override
+          public String resolveCsrfTokenValue(HttpServletRequest req, CsrfToken token) {
+            return req.getHeader("x-xsrf-token");
+          }
+        }))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/login", "/api/auth/signup").anonymous()
-            .requestMatchers("/error").permitAll()
+            .requestMatchers("/error", "/api/auth/csrf").permitAll()
             .anyRequest().authenticated())
+        .logout(logout -> logout
+            .logoutUrl("/api/auth/logout")
+            .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_NO_CONTENT)))
         .formLogin(form -> form.disable());
 
     return http.build();

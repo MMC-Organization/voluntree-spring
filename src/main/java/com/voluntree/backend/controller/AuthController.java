@@ -45,6 +45,6 @@ public class AuthController {
 
     CustomUserDetails user = (CustomUserDetails) authResponse.getPrincipal();
 
-    return ResponseEntity.ok(new AuthenticationResponse(user.getUser().getId()));
+    return ResponseEntity.ok(new AuthenticationResponse(user.getUserId()));
   }
 }

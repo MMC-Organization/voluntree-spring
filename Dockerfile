@@ -1,11 +1,13 @@
 # Perform the extraction in a separate builder container
-FROM bellsoft/liberica-openjre-debian:25-cds AS builder
+FROM bellsoft/liberica-openjdk-debian:25-cds AS builder
 WORKDIR /builder
-# This points to the built jar file in the target folder
-# Adjust this to 'build/libs/*.jar' if you're using Gradle
-ARG JAR_FILE=target/*.jar
-# Copy the jar file to the working directory and rename it to application.jar
-COPY ${JAR_FILE} application.jar
+
+COPY . .
+
+RUN ./mvnw clean package -DskipTests
+
+RUN cp target/*.jar application.jar
+
 # Extract the jar file using an efficient layout
 RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 

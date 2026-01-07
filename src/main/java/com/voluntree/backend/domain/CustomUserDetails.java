@@ -8,23 +8,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.voluntree.backend.domain.organization.Organization;
-import com.voluntree.backend.domain.volunteer.Volunteer;
-
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-  private final User user;
+  private final Long userId;
+  private final String email;
+  private final String password;
+  private final String userType;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    if (user instanceof Volunteer) {
+    if (userType.equals("VOLUNTEER")) {
       return List.of(new SimpleGrantedAuthority("ROLE_VOLUNTEER"));
     }
 
-    if (user instanceof Organization) {
+    if (userType.equals("ORGANIZATION")) {
       return List.of(new SimpleGrantedAuthority("ROLE_ORGANIZATION"));
     }
 
@@ -33,12 +33,15 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public @Nullable String getPassword() {
-    return user.getPassword();
+    return this.password;
   }
 
   @Override
   public String getUsername() {
-    return user.getEmail();
+    return this.email;
   }
-  
+
+  public Long getUserId() {
+    return this.userId;
+  }
 }

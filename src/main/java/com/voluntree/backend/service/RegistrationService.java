@@ -1,24 +1,25 @@
 package com.voluntree.backend.service;
 
 import com.voluntree.backend.domain.Activity;
-import com.voluntree.backend.domain.Log;
 import com.voluntree.backend.domain.Registration;
 import com.voluntree.backend.domain.volunteer.Volunteer; 
 import com.voluntree.backend.dto.RegistrationDTO;
+
+import com.voluntree.backend.events.AuditEvent;
 
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Outcome;
 import com.voluntree.backend.enums.UserType;
 
 import com.voluntree.backend.repository.ActivityRepository;
-import com.voluntree.backend.repository.LogRepository;
 import com.voluntree.backend.repository.RegistrationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -27,7 +28,7 @@ public class RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final ActivityRepository activityRepository;
     private final VolunteerRepository volunteerRepository;
-    private final LogRepository logRepository; 
+    private final ApplicationEventPublisher eventPublisher;
 
     
     @Transactional
@@ -53,7 +54,7 @@ public class RegistrationService {
         registrationRepository.save(registration);
 
         
-        createLog(volunteerId, activityId, "INSCRIÇÃO", "Voluntário se inscreveu na atividade " + activity.getName());
+       publishLog(volunteerId, activityId, "Inscrição realizada na atividade " + activity.getName());
     }
 
   
@@ -67,7 +68,7 @@ public class RegistrationService {
         registrationRepository.save(registration);
 
       
-        createLog(volunteerId, activityId, "CANCELAMENTO", "Cancelou inscrição na atividade " + activityId);
+        publishLog(volunteerId, activityId, "Inscrição cancelada na atividade " + activityId);
     }
 
     public List<RegistrationDTO> getMyRegistrations(Long volunteerId) {
@@ -85,21 +86,19 @@ public class RegistrationService {
     }
 
   
-    private void createLog(Long userId, Long resourceId, String acao, String mensagem) {
-        try {
-            Log log = new Log(
-                null, // ID auto
-                Instant.now(),
-                mensagem,
-                userId,
-                resourceId,
-                UserType.VOLUNTEER,
-                ActionType.CREATE,  
-                Outcome.SUCESS,   
-                com.voluntree.backend.enums.Module.REGISTRATION  
-            ); logRepository.save(log);
-        } catch (Exception e) {
-            System.err.println("Erro ao salvar log: " + e.getMessage());
-        }
+    private void publishLog(Long userId, Long resourceId, String mensagem) {
+        
+        AuditEvent event = new AuditEvent(
+            mensagem,
+            userId,
+            resourceId,
+            UserType.VOLUNTEER,
+            ActionType.CREATE, 
+            Outcome.SUCESS,    
+            com.voluntree.backend.enums.Module.REGISTRATION
+        );
+
+        
+        eventPublisher.publishEvent(event);
     }
 }

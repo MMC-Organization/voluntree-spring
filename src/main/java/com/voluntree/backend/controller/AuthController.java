@@ -68,7 +68,7 @@ public class AuthController {
                 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);    }
 
-    @PostMapping("signup/organization")
+    @PostMapping("/signup/organization")
     public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody OrganizationRegistration dto) {
         Organization newOrg = userService.registerOrganization(dto);
             OrganizationResponse response = new OrganizationResponse(

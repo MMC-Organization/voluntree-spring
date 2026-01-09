@@ -36,7 +36,8 @@ public class UserService {
         
         volunteer.setName(data.name());
         volunteer.setEmail(data.email());
-        volunteer.setPhoneNumber(data.phoneNumber()); //criptografar depois 
+        volunteer.setPassword(data.password()); //criptografar depois         
+        volunteer.setPhoneNumber(data.phoneNumber());
         volunteer.setCep(data.cep());
         volunteer.setNumber(data.number());
         volunteer.setCpf(new Cpf(data.cpf())); 

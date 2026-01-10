@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum Outcome {
   ATTEMP("ATTEMPT"),
-  SUCESS("SUCESS"),
+  SUCCESS("SUCCESS"),
   FAIL("FAIL");
 
   private final String value;

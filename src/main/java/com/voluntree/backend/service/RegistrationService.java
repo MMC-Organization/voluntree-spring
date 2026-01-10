@@ -94,7 +94,7 @@ public class RegistrationService {
             resourceId,
             UserType.VOLUNTEER,
             ActionType.CREATE, 
-            Outcome.SUCESS,    
+            Outcome.SUCCESS,    
             com.voluntree.backend.enums.Module.REGISTRATION
         );
 

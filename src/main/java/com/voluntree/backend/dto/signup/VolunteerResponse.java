@@ -1,4 +1,4 @@
-package com.voluntree.backend.dto.registration;
+package com.voluntree.backend.dto.signup;
 
 import lombok.Data;
 public record VolunteerResponse(

@@ -3,13 +3,13 @@ package com.voluntree.backend.service;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.voluntree.backend.domain.organization.Cnpj;
 import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Cpf;
 import com.voluntree.backend.domain.volunteer.Volunteer;
-import com.voluntree.backend.dto.registration.OrganizationRegistration;
-import com.voluntree.backend.dto.registration.VolunteerRegistration;
+import com.voluntree.backend.dto.signup.OrganizationRequest;
+import com.voluntree.backend.dto.signup.VolunteerRequest;
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Outcome;
 import com.voluntree.backend.enums.UserType;
@@ -25,18 +25,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j // para ver no console
 public class UserService {
-  
+
+    private final PasswordEncoder passwordEncoder;
     private final VolunteerRepository volunteerRepository;
     private final OrganizationRepository organizationRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Volunteer registerVolunteer(VolunteerRegistration data) {
+    public Volunteer registerVolunteer(VolunteerRequest data) {
         Volunteer volunteer = new Volunteer();
         
         volunteer.setName(data.name());
         volunteer.setEmail(data.email());
-        volunteer.setPassword(data.password()); //criptografar depois         
+        volunteer.setPassword(passwordEncoder.encode(data.password())); //criptografar depois         
         volunteer.setPhoneNumber(data.phoneNumber());
         volunteer.setCep(data.cep());
         volunteer.setNumber(data.number());
@@ -61,12 +62,13 @@ public class UserService {
     }
 
     @Transactional
-    public Organization registerOrganization(OrganizationRegistration data) {
+    public Organization registerOrganization(OrganizationRequest data) {
         Organization organization = new Organization();
+
         
         organization.setName(data.name());
         organization.setEmail(data.email());
-        organization.setPassword(data.password()); // Criptografar depois 
+        organization.setPassword(passwordEncoder.encode(data.password())); // Criptografar depois 
         organization.setPhoneNumber(data.phoneNumber());
         organization.setCep(data.cep());
         organization.setNumber(data.number());

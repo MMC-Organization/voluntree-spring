@@ -9,14 +9,15 @@ import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Volunteer;
 import com.voluntree.backend.dto.auth.AuthenticationRequest;
 import com.voluntree.backend.dto.auth.AuthenticationResponse;
-import com.voluntree.backend.dto.registration.OrganizationRegistration;
-import com.voluntree.backend.dto.registration.OrganizationResponse;
-import com.voluntree.backend.dto.registration.VolunteerRegistration;
-import com.voluntree.backend.dto.registration.VolunteerResponse;
+import com.voluntree.backend.dto.signup.OrganizationRequest;
+import com.voluntree.backend.dto.signup.OrganizationResponse;
+import com.voluntree.backend.dto.signup.VolunteerRequest;
+import com.voluntree.backend.dto.signup.VolunteerResponse;
 import com.voluntree.backend.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -59,7 +60,7 @@ public class AuthController {
 
      
     @PostMapping("/signup/volunteer")
-    public ResponseEntity<VolunteerResponse> signupVolunteer(@RequestBody VolunteerRegistration dto) {
+    public ResponseEntity<VolunteerResponse> signupVolunteer(@RequestBody @Valid VolunteerRequest dto) {
         Volunteer newVolunteer = userService.registerVolunteer(dto);
         VolunteerResponse response = new VolunteerResponse(
                             newVolunteer.getName(),
@@ -69,7 +70,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);    }
 
     @PostMapping("/signup/organization")
-    public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody OrganizationRegistration dto) {
+    public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody @Valid OrganizationRequest dto) {
         Organization newOrg = userService.registerOrganization(dto);
             OrganizationResponse response = new OrganizationResponse(
                             newOrg.getName(),

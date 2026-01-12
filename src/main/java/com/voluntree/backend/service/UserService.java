@@ -19,9 +19,9 @@ import com.voluntree.backend.enums.Module;
 import com.voluntree.backend.events.AuditEvent;
 import com.voluntree.backend.repository.OrganizationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
+import com.voluntree.backend.dto.user.UpdateRequest;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -104,5 +104,10 @@ public class UserService {
             savedOrganization.getCompanyName(), 
             savedOrganization.getCause()
         );
+    }
+
+    // Mariana implementa a lógica aqui 
+    @Transactional
+    public void updateUser(Long id, UpdateRequest dto) {
     }
 }

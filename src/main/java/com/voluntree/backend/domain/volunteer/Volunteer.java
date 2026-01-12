@@ -1,6 +1,5 @@
 package com.voluntree.backend.domain.volunteer;
 
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.voluntree.backend.domain.User;
 

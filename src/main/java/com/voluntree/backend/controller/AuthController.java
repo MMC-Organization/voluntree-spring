@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.voluntree.backend.domain.CustomUserDetails;
-import com.voluntree.backend.domain.organization.Organization;
-import com.voluntree.backend.domain.volunteer.Volunteer;
 import com.voluntree.backend.dto.auth.AuthenticationRequest;
 import com.voluntree.backend.dto.auth.AuthenticationResponse;
 import com.voluntree.backend.dto.signup.OrganizationRequest;
@@ -36,50 +34,40 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final UserService userService;
-  private final AuthenticationManager authManager;
-  private final SecurityContextRepository securityContextRepo;
-  private final SecurityContextHolderStrategy securityContextHolderStrat = SecurityContextHolder
-      .getContextHolderStrategy();
+    private final UserService userService;
+    private final AuthenticationManager authManager;
+    private final SecurityContextRepository securityContextRepo;
+    private final SecurityContextHolderStrategy securityContextHolderStrat = SecurityContextHolder.getContextHolderStrategy();
 
-  @PostMapping("/login")
-  public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
-      HttpServletRequest request, HttpServletResponse response) {
-    Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
-    Authentication authResponse = this.authManager.authenticate(authRequest);
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
+            HttpServletRequest request, HttpServletResponse response) {
+        Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
+        Authentication authResponse = this.authManager.authenticate(authRequest);
 
-    SecurityContext context = securityContextHolderStrat.createEmptyContext();
-    context.setAuthentication(authResponse);
-    securityContextHolderStrat.setContext(context);
-    securityContextRepo.saveContext(context, request, response);
+        SecurityContext context = securityContextHolderStrat.createEmptyContext();
+        context.setAuthentication(authResponse);
+        securityContextHolderStrat.setContext(context);
+        securityContextRepo.saveContext(context, request, response);
 
-    CustomUserDetails user = (CustomUserDetails) authResponse.getPrincipal();
+        CustomUserDetails user = (CustomUserDetails) authResponse.getPrincipal();
 
-    return ResponseEntity.ok(new AuthenticationResponse(user.getUserId()));
-  }
-
+        return ResponseEntity.ok(new AuthenticationResponse(user.getUserId()));
+    }
      
     @PostMapping("/signup/volunteer")
     public ResponseEntity<VolunteerResponse> signupVolunteer(@RequestBody @Valid VolunteerRequest dto) {
-        Volunteer newVolunteer = userService.registerVolunteer(dto);
-        VolunteerResponse response = new VolunteerResponse(
-                            newVolunteer.getName(),
-                            newVolunteer.getEmail()
-                        );
-                
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);    }
+
+        VolunteerResponse response = userService.registerVolunteer(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);    
+    }
 
     @PostMapping("/signup/organization")
     public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody @Valid OrganizationRequest dto) {
-        Organization newOrg = userService.registerOrganization(dto);
-            OrganizationResponse response = new OrganizationResponse(
-                            newOrg.getName(),
-                            newOrg.getEmail(),
-                            newOrg.getPhoneNumber(),
-                            newOrg.getCep(),
-                            newOrg.getCompanyName(),
-                            newOrg.getCause()
-                        );
+
+        OrganizationResponse response = userService.registerOrganization(dto);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

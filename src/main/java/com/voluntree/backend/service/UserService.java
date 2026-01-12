@@ -9,7 +9,9 @@ import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Cpf;
 import com.voluntree.backend.domain.volunteer.Volunteer;
 import com.voluntree.backend.dto.signup.OrganizationRequest;
+import com.voluntree.backend.dto.signup.OrganizationResponse;
 import com.voluntree.backend.dto.signup.VolunteerRequest;
+import com.voluntree.backend.dto.signup.VolunteerResponse;
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Outcome;
 import com.voluntree.backend.enums.UserType;
@@ -23,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j // para ver no console
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
@@ -32,12 +33,12 @@ public class UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Volunteer registerVolunteer(VolunteerRequest data) {
+    public VolunteerResponse registerVolunteer(VolunteerRequest data) {
         Volunteer volunteer = new Volunteer();
         
         volunteer.setName(data.name());
         volunteer.setEmail(data.email());
-        volunteer.setPassword(passwordEncoder.encode(data.password())); //criptografar depois         
+        volunteer.setPassword(passwordEncoder.encode(data.password()));          
         volunteer.setPhoneNumber(data.phoneNumber());
         volunteer.setCep(data.cep());
         volunteer.setNumber(data.number());
@@ -58,17 +59,20 @@ public class UserService {
         eventPublisher.publishEvent(event);
     
 
-        return savedVolunteer;
+        return new VolunteerResponse(
+            savedVolunteer.getName(),
+            savedVolunteer.getEmail()
+        );
     }
 
     @Transactional
-    public Organization registerOrganization(OrganizationRequest data) {
+    public OrganizationResponse registerOrganization(OrganizationRequest data) {
         Organization organization = new Organization();
 
         
         organization.setName(data.name());
         organization.setEmail(data.email());
-        organization.setPassword(passwordEncoder.encode(data.password())); // Criptografar depois 
+        organization.setPassword(passwordEncoder.encode(data.password())); 
         organization.setPhoneNumber(data.phoneNumber());
         organization.setCep(data.cep());
         organization.setNumber(data.number());
@@ -92,6 +96,13 @@ public class UserService {
 
         eventPublisher.publishEvent(event);
 
-        return  savedOrganization;
+       return new OrganizationResponse(
+            savedOrganization.getName(),       
+            savedOrganization.getEmail(),
+            savedOrganization.getPhoneNumber(),
+            savedOrganization.getCep(),
+            savedOrganization.getCompanyName(), 
+            savedOrganization.getCause()
+        );
     }
 }

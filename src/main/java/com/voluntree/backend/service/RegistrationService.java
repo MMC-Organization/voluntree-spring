@@ -1,27 +1,25 @@
 package com.voluntree.backend.service;
 
-import com.voluntree.backend.domain.Activity;
-import com.voluntree.backend.domain.Registration;
-import com.voluntree.backend.domain.volunteer.Volunteer; 
-import com.voluntree.backend.dto.RegistrationDTO;
-
-import com.voluntree.backend.events.AuditEvent;
-
-import com.voluntree.backend.enums.ActionType;
-import com.voluntree.backend.enums.Outcome;
-import com.voluntree.backend.enums.UserType;
-
-import com.voluntree.backend.repository.ActivityRepository;
-import com.voluntree.backend.repository.RegistrationRepository;
-import com.voluntree.backend.repository.VolunteerRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.voluntree.backend.domain.Activity;
+import com.voluntree.backend.domain.Registration;
+import com.voluntree.backend.domain.volunteer.Volunteer; 
+import com.voluntree.backend.dto.RegistrationDTO   ;
+import com.voluntree.backend.enums.ActionType;
+import com.voluntree.backend.enums.Outcome;
+import com.voluntree.backend.enums.UserType;
+import com.voluntree.backend.events.AuditEvent;
+import com.voluntree.backend.repository.ActivityRepository;
+import com.voluntree.backend.repository.RegistrationRepository;
+import com.voluntree.backend.repository.VolunteerRepository;
+
+import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
@@ -34,8 +32,20 @@ public class RegistrationService {
     @Transactional
     public void subscribe(Long volunteerId, Long activityId) {
         
-        if (registrationRepository.existsByVolunteerIdAndActivityIdAndCanceledFalse(volunteerId, activityId)) {
-            throw new IllegalArgumentException("Você já está inscrito nesta atividade.");
+     
+        var existingRegistration = registrationRepository.findByVolunteerIdAndActivityId(volunteerId, activityId);
+        if (existingRegistration.isPresent()) {
+            Registration registration = existingRegistration.get();
+            if (!registration.getCanceled()) {
+                throw new IllegalArgumentException("Você já está inscrito nesta atividade.");
+            }
+            
+            
+            registration.setCanceled(false);
+            registrationRepository.save(registration);
+            
+            publishLog(volunteerId, activityId, "RE-INSCRIÇÃO");
+            return; 
         }
 
         

@@ -11,6 +11,7 @@ import lombok.Setter;
 
 @Entity
 @DiscriminatorValue("ORGANIZATION")
+
 @Getter
 @Setter
 public class Organization extends User {

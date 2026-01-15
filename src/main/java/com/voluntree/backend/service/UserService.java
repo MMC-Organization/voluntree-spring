@@ -10,8 +10,11 @@ import com.voluntree.backend.domain.organization.Cnpj;
 import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Cpf;
 import com.voluntree.backend.domain.volunteer.Volunteer;
+// CLARA: Tive que criar estes DTOs para o método updateUser funcionar e compilar.
+// 
 import com.voluntree.backend.dto.profile.UpdateProfileRequest;
 import com.voluntree.backend.dto.profile.UserResponse;
+//
 import com.voluntree.backend.dto.signup.OrganizationRequest;
 import com.voluntree.backend.dto.signup.OrganizationResponse;
 import com.voluntree.backend.dto.signup.VolunteerRequest;

@@ -4,11 +4,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.voluntree.backend.domain.User;
 import com.voluntree.backend.domain.organization.Cnpj;
 import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Cpf;
 import com.voluntree.backend.domain.volunteer.Volunteer;
-
+import com.voluntree.backend.dto.profile.UpdateProfileRequest;
+import com.voluntree.backend.dto.profile.UserResponse;
 import com.voluntree.backend.dto.signup.OrganizationRequest;
 import com.voluntree.backend.dto.signup.OrganizationResponse;
 import com.voluntree.backend.dto.signup.VolunteerRequest;
@@ -20,12 +23,14 @@ import com.voluntree.backend.enums.Module;
 import com.voluntree.backend.events.AuditEvent;
 import com.voluntree.backend.repository.OrganizationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
+import com.voluntree.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
@@ -47,17 +52,18 @@ public class UserService {
 
         Volunteer savedVolunteer = volunteerRepository.save(volunteer);
 
-        AuditEvent event = new AuditEvent(
+        publishLog(
             "Novo voluntário cadastrado: " + savedVolunteer.getEmail(), 
             savedVolunteer.getId(), 
             savedVolunteer.getId(), 
             UserType.VOLUNTEER,     
-            ActionType.CREATE,     
-            Outcome.SUCCESS,        
-            Module.AUTH     
+            ActionType.CREATE,  
+            Module.AUTH 
         );
+
         
-        eventPublisher.publishEvent(event);
+        
+        
     
 
         return new VolunteerResponse(
@@ -85,17 +91,15 @@ public class UserService {
 
         Organization savedOrganization = organizationRepository.save(organization);
 
-        AuditEvent event = new AuditEvent(
+        publishLog(
             "Nova organização cadastrada: " + savedOrganization.getCompanyName(),
             savedOrganization.getId(),
             savedOrganization.getId(),
             UserType.ORGANIZATION, 
             ActionType.CREATE,
-            Outcome.SUCCESS,
             Module.AUTH
         );
 
-        eventPublisher.publishEvent(event);
 
        return new OrganizationResponse(
             savedOrganization.getName(),       
@@ -105,5 +109,62 @@ public class UserService {
             savedOrganization.getCompanyName(), 
             savedOrganization.getCause()
         );
+    }
+    
+    @Transactional
+    public UserResponse updateUser(Long userId, UpdateProfileRequest data) {
+        User user = userRepository.findById(userId) //dando erro aqui 
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (data.name() != null && !data.name().isBlank()) {
+            user.setName(data.name());
+        }
+        if (data.phoneNumber() != null && !data.phoneNumber().isBlank()) {
+            user.setPhoneNumber(data.phoneNumber());
+        }
+        if (data.cep() != null && !data.cep().isBlank()) {
+            user.setCep(data.cep());
+        }
+        if (data.number() != null && !data.number().isBlank()) {
+            user.setNumber(data.number());
+        }
+        if (data.email() != null && !data.email().isBlank()) {
+            user.setEmail(data.email());
+        }
+
+        User updatedUser = userRepository.save(user);
+
+       
+        UserType userType = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
+
+        publishLog(
+            "Perfil atualizado com sucesso",
+            updatedUser.getId(),
+            updatedUser.getId(),
+            userType,
+            ActionType.UPDATE,
+            Module.PROFILE 
+        );
+
+        return new UserResponse(
+            updatedUser.getId(),
+            updatedUser.getName(),
+            updatedUser.getEmail(),
+            updatedUser.getPhoneNumber(),
+            updatedUser.getCep()
+        );
+    }
+
+    private void publishLog(String msg, Long userId, Long resourceId, UserType userType, ActionType action, Module module) {
+        AuditEvent event = new AuditEvent(
+            msg,
+            userId,
+            resourceId,
+            userType,
+            action,
+            Outcome.SUCCESS, 
+            module
+        );
+        eventPublisher.publishEvent(event);
     }
 }

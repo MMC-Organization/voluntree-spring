@@ -25,4 +25,8 @@ public class Organization extends User {
 
   @Column
   private String cause;
+//testando so com isso pq tava dando um erro estranho
+    public void setName(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

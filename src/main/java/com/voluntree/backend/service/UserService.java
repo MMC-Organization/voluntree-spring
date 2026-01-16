@@ -4,6 +4,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.voluntree.backend.domain.User;
 import com.voluntree.backend.domain.organization.Cnpj;
 import com.voluntree.backend.domain.organization.Organization;
 import com.voluntree.backend.domain.volunteer.Cpf;
@@ -19,6 +21,8 @@ import com.voluntree.backend.enums.Module;
 import com.voluntree.backend.events.AuditEvent;
 import com.voluntree.backend.repository.OrganizationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
+import com.voluntree.backend.repository.UserRepository;
+import com.voluntree.backend.dto.user.ProfileResponse;
 import com.voluntree.backend.dto.user.UpdateRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +33,8 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final VolunteerRepository volunteerRepository;
+    private final UserRepository userRepository;
+    
     private final OrganizationRepository organizationRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -106,8 +112,70 @@ public class UserService {
         );
     }
 
-    // Mariana implementa a lógica aqui 
+
+     public ProfileResponse getProfile(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        // Inicializa campos específicos como nulos
+        String userType = (user instanceof Volunteer) ? "VOLUNTEER" : "ORGANIZATION";
+        String cpf = null;
+        String cnpj = null;
+        String companyName = null;
+        String cause = null;
+
+        // Trata dados de Voluntário
+        if (user instanceof Volunteer v) {
+            cpf = v.getCpf().getCpf();
+        } 
+        // Trata dados de Organização
+        else if (user instanceof Organization org) {
+            cnpj = org.getCnpj().getCnpj();
+            companyName = org.getCompanyName();
+            cause = org.getCause();
+        }
+
+        return new ProfileResponse(
+            user.getName(),
+            user.getEmail(),
+            user.getPhoneNumber(),
+            user.getCep(),
+            user.getNumber(),
+            userType,
+            cpf,
+            cnpj,
+            companyName,
+            cause
+        );
+    }
+
     @Transactional
     public void updateUser(Long id, UpdateRequest dto) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        user.setName(dto.name());
+        user.setPhoneNumber(dto.phoneNumber());
+        user.setCep(dto.cep());
+        user.setNumber(dto.number());
+
+        userRepository.save(user);
+
+        UserType type = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
+
+    
+        AuditEvent event = new AuditEvent(
+            "Perfil atualizado com sucesso", 
+            id, 
+            id, 
+            type,     
+            ActionType.UPDATE,     
+            Outcome.SUCCESS,        
+            Module.PROFILE     
+        );
+        
+        eventPublisher.publishEvent(event);
+        }
+
+
     }
-}

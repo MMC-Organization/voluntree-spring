@@ -30,8 +30,8 @@ public class AuditController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
         Long userId = user.getUserId();
-
-        Page<AuditLogResponse> logs = auditService.getUserLogs(userId, pageable);
+//////////////////////
+        Page<AuditLogResponse> logs = auditService.getUserLogs(userId, null, pageable);
 
         return ResponseEntity.ok(logs);
     }

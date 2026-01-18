@@ -16,6 +16,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +24,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+  private final RlsInterceptor rlsInterceptor;
+
+  public SecurityConfig(RlsInterceptor rlsInterceptor) {
+    this.rlsInterceptor = rlsInterceptor;
+  }
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,7 +48,8 @@ public class SecurityConfig {
         .logout(logout -> logout
             .logoutUrl("/api/auth/logout")
             .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_NO_CONTENT)))
-        .formLogin(form -> form.disable());
+        .formLogin(form -> form.disable())
+        .addFilterAfter(rlsInterceptor, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

@@ -9,8 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.voluntree.backend.domain.volunteer.Cpf;
 import com.voluntree.backend.domain.volunteer.Volunteer;
 import com.voluntree.backend.repository.UserRepository;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication
+@EnableAspectJAutoProxy
 public class BackendApplication {
 
   public static void main(String[] args) {

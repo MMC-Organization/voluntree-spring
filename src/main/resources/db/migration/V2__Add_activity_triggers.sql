@@ -1,7 +1,9 @@
+SET search_path TO develop, public;
+
 CREATE
 OR REPLACE FUNCTION vrf_activity_creator () RETURNS TRIGGER AS $$
 BEGIN
-  IF NOT EXISTS(SELECT 1 FROM users WHERE id = NEW.organization_id AND user_type = 'ORGANIZATION') THEN
+  IF NOT EXISTS(SELECT 1 FROM develop.users WHERE id = NEW.organization_id AND user_type = 'ORGANIZATION') THEN
     RAISE EXCEPTION USING MESSAGE = 'Organização associada à atividade não encontrado!', ERRCODE = 23514;
   END IF;
 

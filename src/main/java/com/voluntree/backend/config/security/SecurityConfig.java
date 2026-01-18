@@ -38,11 +38,15 @@ public class SecurityConfig {
         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler() {
           @Override
           public String resolveCsrfTokenValue(HttpServletRequest req, CsrfToken token) {
-            return req.getHeader("x-xsrf-token");
+            String headerValue = req.getHeader("X-XSRF-TOKEN");
+            if (headerValue == null) {
+              headerValue = req.getHeader("x-xsrf-token");
+            }
+            return headerValue;
           }
         }))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login", "/api/auth/signup").anonymous()
+            .requestMatchers("/api/auth/login", "/api/auth/signup/**").permitAll()
             .requestMatchers("/error", "/api/auth/csrf").permitAll()
             .anyRequest().authenticated())
         .logout(logout -> logout

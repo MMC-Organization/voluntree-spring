@@ -21,7 +21,6 @@ import com.voluntree.backend.repository.OrganizationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

@@ -109,8 +109,6 @@ CREATE POLICY registration_org_view_own_activity ON registration FOR SELECT
   );
 
 
--- u
-
 CREATE POLICY registration_volunteer_create ON registration FOR INSERT
   WITH CHECK (
     EXISTS (

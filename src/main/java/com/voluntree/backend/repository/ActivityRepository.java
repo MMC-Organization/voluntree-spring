@@ -19,8 +19,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
   
   @Query("SELECT a FROM Activity a WHERE a.activityDate > :now AND a.canceled = false")
   Page<Activity> findUpcomingActivities(@Param("now") LocalDateTime now, Pageable pageable);
-  //ver esse .id depois 
-  @Query("SELECT a FROM Activity a WHERE a.organizationId = :organizationId AND a.activityDate > :now")
+  
+  @Query("SELECT a FROM Activity a WHERE a.organization.id = :organizationId AND a.activityDate > :now")
   Page<Activity> findUpcomingActivitiesByOrganization(@Param("organizationId") Long organizationId, 
                                                         @Param("now") LocalDateTime now, 
                                                         Pageable pageable);

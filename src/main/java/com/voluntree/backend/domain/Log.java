@@ -36,13 +36,13 @@ public class Log {
   @Column(nullable = false, updatable = false)
   private String message;
 
-  @Column(nullable = false, updatable = false)
+  @Column(updatable = false)
   private Long userId;
 
   @Column(updatable = false)
   private Long affectedResourceId;
 
-  @Column(nullable = false, updatable = false, length = 30)
+  @Column(updatable = false, length = 30)
   private UserType userType;
 
   @Column(nullable = false, updatable = false, length = 30)

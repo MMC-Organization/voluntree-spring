@@ -8,6 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.voluntree.backend.enums.UserType;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -16,15 +18,15 @@ public class CustomUserDetails implements UserDetails {
   private final Long userId;
   private final String email;
   private final String password;
-  private final String userType;
+  private final UserType userType;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    if (userType.equals("VOLUNTEER")) {
+    if (userType.getValue().equals("VOLUNTEER")) {
       return List.of(new SimpleGrantedAuthority("ROLE_VOLUNTEER"));
     }
 
-    if (userType.equals("ORGANIZATION")) {
+    if (userType.getValue().equals("ORGANIZATION")) {
       return List.of(new SimpleGrantedAuthority("ROLE_ORGANIZATION"));
     }
 
@@ -43,5 +45,9 @@ public class CustomUserDetails implements UserDetails {
 
   public Long getUserId() {
     return this.userId;
+  }
+
+  public UserType getUserType() {
+    return this.userType;
   }
 }

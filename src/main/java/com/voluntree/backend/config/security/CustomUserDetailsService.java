@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.voluntree.backend.domain.CustomUserDetails;
 import com.voluntree.backend.domain.User;
 import com.voluntree.backend.domain.volunteer.Volunteer;
+import com.voluntree.backend.enums.UserType;
 import com.voluntree.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     User user = repo.findByEmail(email)
         .orElseThrow(() -> new UsernameNotFoundException("Usuário com e-mail \"" + email + "\" não foi encontrado"));
 
-    String userType = (user instanceof Volunteer) ? "VOLUNTEER" : "ORGANIZATION";
+    UserType userType = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
 
     return new CustomUserDetails(
         user.getId(),

@@ -1,10 +1,14 @@
 package com.voluntree.backend.controller;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -40,12 +44,22 @@ public class AuthController {
   private final SecurityContextRepository securityContextRepo;
   private final SecurityContextHolderStrategy securityContextHolderStrat = SecurityContextHolder
       .getContextHolderStrategy();
+  private final ApplicationEventPublisher eventPublisher;
 
   @PostMapping("/login")
   public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
     Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
-    Authentication authResponse = this.authManager.authenticate(authRequest);
+    Authentication authResponse;
+
+    try {
+      authResponse = this.authManager.authenticate(authRequest);
+
+      eventPublisher.publishEvent(new AuthenticationSuccessEvent(authResponse));
+    } catch (AuthenticationException e) {
+      eventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(authRequest, e));
+      throw e;
+    }
 
     SecurityContext context = securityContextHolderStrat.createEmptyContext();
     context.setAuthentication(authResponse);

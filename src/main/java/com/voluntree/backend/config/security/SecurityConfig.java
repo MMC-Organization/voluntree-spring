@@ -35,7 +35,7 @@ public class SecurityConfig {
           }
         }))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login", "/api/auth/signup").anonymous()
+            .requestMatchers("/api/auth/login","/api/auth/signup/volunteer","/api/auth/signup/organization").anonymous()
             .requestMatchers("/error", "/api/auth/csrf").permitAll()
             .anyRequest().authenticated())
         .logout(logout -> logout

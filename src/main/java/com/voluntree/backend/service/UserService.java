@@ -22,6 +22,7 @@ import com.voluntree.backend.events.AuditEvent;
 import com.voluntree.backend.repository.OrganizationRepository;
 import com.voluntree.backend.repository.VolunteerRepository;
 import com.voluntree.backend.repository.UserRepository;
+import com.voluntree.backend.dto.user.PasswordUpdateRequest;
 import com.voluntree.backend.dto.user.ProfileResponse;
 import com.voluntree.backend.dto.user.UpdateRequest;
 
@@ -177,5 +178,26 @@ public class UserService {
         eventPublisher.publishEvent(event);
         }
 
+
+@Transactional
+public void updatePassword(Long id, PasswordUpdateRequest dto) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+    if (!passwordEncoder.matches(dto.oldPassword(), user.getPassword())) {
+        throw new RuntimeException("A senha atual está incorreta");
+    }
+
+    user.setPassword(passwordEncoder.encode(dto.newPassword()));
+    userRepository.save(user);
+
+    // Registra a troca de senha
+    UserType type = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
+    eventPublisher.publishEvent(new AuditEvent(
+        "Senha alterada com sucesso", 
+        id, id, type, 
+        ActionType.UPDATE, Outcome.SUCCESS, Module.PROFILE
+    ));
+}
 
     }

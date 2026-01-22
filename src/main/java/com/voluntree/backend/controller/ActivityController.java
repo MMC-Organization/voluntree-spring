@@ -5,8 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +22,9 @@ import com.voluntree.backend.dto.activity.ActivityResponse;
 import com.voluntree.backend.dto.activity.ActivityUpdateRequest;
 import com.voluntree.backend.service.ActivityService;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,9 +37,8 @@ public class ActivityController {
 
    
     @PostMapping
-    public ResponseEntity<ActivityResponse> createActivity(@RequestBody @Valid ActivityRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+    @PreAuthorize("hasRole('ORGANIZATION')")
+    public ResponseEntity<ActivityResponse> createActivity(@RequestBody @Valid ActivityRequest request, @AuthenticationPrincipal CustomUserDetails user) {
         Long organizationId = user.getUserId();
 
         ActivityResponse response = activityService.createActivity(request, organizationId);
@@ -79,9 +79,7 @@ public class ActivityController {
    
     @GetMapping("/my-activities")
     public ResponseEntity<Page<ActivityListResponse>> getMyActivities(
-            @PageableDefault(size = 20, sort = "activityDate") Pageable pageable) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+            @PageableDefault(size = 20, sort = "activityDate") Pageable pageable,  @AuthenticationPrincipal CustomUserDetails user) {
         Long organizationId = user.getUserId();
 
         Page<ActivityListResponse> activities = activityService.getActivitiesByOrganization(organizationId, pageable);
@@ -89,11 +87,10 @@ public class ActivityController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ORGANIZATION')")
     public ResponseEntity<ActivityResponse> updateActivity(
             @PathVariable Long id,
-            @RequestBody @Valid ActivityUpdateRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+            @RequestBody @Valid ActivityUpdateRequest request, @AuthenticationPrincipal CustomUserDetails user) {
         Long organizationId = user.getUserId();
 
         ActivityResponse response = activityService.updateActivity(id, request, organizationId);
@@ -101,9 +98,9 @@ public class ActivityController {
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelActivity(@PathVariable Long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+    @PreAuthorize("hasRole('ORGANIZATION')")
+    public ResponseEntity<Void> cancelActivity(@PathVariable Long id,  @AuthenticationPrincipal CustomUserDetails user) {
+    
         Long organizationId = user.getUserId();
 
         activityService.cancelActivity(id, organizationId);
@@ -111,9 +108,8 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteActivity(@PathVariable Long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+    @PreAuthorize("hasRole('ORGANIZATION')")
+    public ResponseEntity<Void> deleteActivity(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails user) {
         Long organizationId = user.getUserId();
 
         activityService.deleteActivity(id, organizationId);

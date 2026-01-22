@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
   @Bean
@@ -43,6 +45,7 @@ public class SecurityConfig {
           }
         }))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/login","/api/auth/signup/volunteer","/api/auth/signup/organization").anonymous()
             .requestMatchers("/error", "/api/auth/**").permitAll()
             .anyRequest().authenticated())
         .logout(logout -> logout

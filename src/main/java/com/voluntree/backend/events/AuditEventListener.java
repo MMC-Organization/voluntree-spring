@@ -3,11 +3,10 @@ package com.voluntree.backend.events;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.voluntree.backend.domain.Log;
 import com.voluntree.backend.repository.LogRepository;
-
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 

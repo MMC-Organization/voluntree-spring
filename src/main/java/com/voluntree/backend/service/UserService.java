@@ -110,10 +110,10 @@ public class UserService {
 
 
      public ProfileResponse getProfile(Long id) {
+
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // Inicializa campos específicos como nulos
         String userType = (user instanceof Volunteer) ? "VOLUNTEER" : "ORGANIZATION";
         String cpf = null;
         String cnpj = null;
@@ -150,6 +150,16 @@ public class UserService {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+        String novoEmail = dto.email();
+    
+        // Só verificamos se o e-mail já existe se o usuário estiver tentando mudar para um e-mail DIFERENTE do atual
+        if (!novoEmail.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(novoEmail)) {
+                throw new RuntimeException("Este e-mail já está em uso por outro usuário");
+            }
+            user.setEmail(novoEmail);
+        }
+
         user.setName(dto.name());
         user.setPhoneNumber(dto.phoneNumber());
         user.setCep(dto.cep());
@@ -160,7 +170,7 @@ public class UserService {
         UserType type = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
 
     
-        AuditEvent event = new AuditEvent(
+        eventPublisher.publishEvent(new AuditEvent(
             "Perfil atualizado com sucesso", 
             id, 
             id, 
@@ -168,9 +178,8 @@ public class UserService {
             ActionType.UPDATE,     
             Outcome.SUCCESS,        
             Module.PROFILE     
-        );
-        
-        eventPublisher.publishEvent(event);
+        ));
+       ;
         }
 
 
@@ -186,12 +195,14 @@ public void updatePassword(Long id, PasswordUpdateRequest dto) {
     user.setPassword(passwordEncoder.encode(dto.newPassword()));
     userRepository.save(user);
 
-    // Registra a troca de senha
     UserType type = (user instanceof Volunteer) ? UserType.VOLUNTEER : UserType.ORGANIZATION;
+
     eventPublisher.publishEvent(new AuditEvent(
         "Senha alterada com sucesso", 
         id, id, type, 
-        ActionType.UPDATE, Outcome.SUCCESS, Module.PROFILE
+        ActionType.UPDATE, 
+        Outcome.SUCCESS, 
+        Module.PROFILE
     ));
 }
 

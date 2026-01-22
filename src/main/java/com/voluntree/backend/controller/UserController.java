@@ -33,7 +33,6 @@ private final UserService userService;
 @GetMapping("/me")
 public ResponseEntity<ProfileResponse> getMyProfile(@AuthenticationPrincipal CustomUserDetails currentUser) {
     
-    // Pega o ID diretamente do token/sessão
     ProfileResponse profile = userService.getProfile(currentUser.getUserId());
     return ResponseEntity.ok(profile);
 }
@@ -41,18 +40,16 @@ public ResponseEntity<ProfileResponse> getMyProfile(@AuthenticationPrincipal Cus
 @PutMapping("/me")
     public ResponseEntity<Void> update(@AuthenticationPrincipal CustomUserDetails currentUser, @Valid @RequestBody UpdateRequest dto) {
 
-        // currentUser.getUserId() garante que o usuário só altere a si mesmo
         userService.updateUser(currentUser.getUserId(), dto);
         
         return ResponseEntity.noContent().build();
     }
 
 @PatchMapping("/me/password")
-public ResponseEntity<Void> updatePassword(
-    @AuthenticationPrincipal CustomUserDetails currentUser,
-    @Valid @RequestBody PasswordUpdateRequest dto
-) {
+public ResponseEntity<Void> updatePassword( @AuthenticationPrincipal CustomUserDetails currentUser, @Valid @RequestBody PasswordUpdateRequest dto) {
+
     userService.updatePassword(currentUser.getUserId(), dto);
+    
     return ResponseEntity.noContent().build();
 }
 }

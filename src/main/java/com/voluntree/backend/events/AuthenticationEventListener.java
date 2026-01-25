@@ -29,7 +29,7 @@ public class AuthenticationEventListener {
 
     CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 
-    Log log = new Log(null, null, "Usuário autenticado com sucesso!", user.getUserId(), null,
+    Log log = new Log("Usuário autenticado com sucesso!", user.getUserId(), null,
         user.getUserType(), ActionType.SIGNIN, Outcome.SUCCESS, Module.AUTH);
 
     repo.save(log);
@@ -39,7 +39,7 @@ public class AuthenticationEventListener {
   public void onFailure(AbstractAuthenticationFailureEvent event) {
     Authentication auth = event.getAuthentication();
 
-    Log log = new Log(null, null, "Erro de autenticação com email: " + auth.getName(), null, null,
+    Log log = new Log("Erro de autenticação com email: " + auth.getName(), null, null,
         null, ActionType.SIGNIN, Outcome.FAIL, Module.AUTH);
 
     repo.save(log);

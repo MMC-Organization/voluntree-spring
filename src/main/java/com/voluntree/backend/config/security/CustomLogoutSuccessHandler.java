@@ -24,7 +24,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
   @Override
   public void onLogoutSuccess(HttpServletRequest req, HttpServletResponse res, @Nullable Authentication auth) {
     if (auth != null && auth.getPrincipal() instanceof CustomUserDetails user) {
-      repo.save(new Log(null, null, "Usuário desconectado!", user.getUserId(), null, user.getUserType(),
+      repo.save(new Log("Usuário desconectado!", user.getUserId(), null, user.getUserType(),
           ActionType.SIGNOUT, Outcome.SUCCESS, Module.AUTH));
     }
 

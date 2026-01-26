@@ -17,7 +17,7 @@ import lombok.Setter;
 public class Organization extends User {
 
   @Convert(converter = CnpjConverter.class)
-  @Column(length = 14)
+  @Column(length = 255)
   private Cnpj cnpj;
 
   @Column(length = 255)

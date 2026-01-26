@@ -2,6 +2,7 @@ package com.voluntree.backend.controller;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +34,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class AuthController {
       .getContextHolderStrategy();
   private final ApplicationEventPublisher eventPublisher;
 
-  @PostMapping("/login")
+  @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
     Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
@@ -80,7 +80,7 @@ public class AuthController {
     return ResponseEntity.ok(new AuthenticationStatusResponse("Usuário autenticado!", true));
   }
 
-  @PostMapping("/signup/volunteer")
+  @PostMapping(value = "/signup/volunteer", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<VolunteerResponse> signupVolunteer(@RequestBody @Valid VolunteerRequest dto) {
 
     VolunteerResponse response = userService.registerVolunteer(dto);
@@ -88,7 +88,7 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @PostMapping("/signup/organization")
+  @PostMapping(value = "/signup/organization", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody @Valid OrganizationRequest dto) {
 
     OrganizationResponse response = userService.registerOrganization(dto);

@@ -61,4 +61,10 @@ public class Cnpj {
   public String getCnpj() {
     return this.cnpj;
   }
+
+  public String getMasked() {
+        if (cnpj == null) return null;
+        return "**.***.***/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12);
+    }
+    
 }

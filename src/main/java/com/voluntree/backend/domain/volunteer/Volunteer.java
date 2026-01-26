@@ -21,7 +21,7 @@ import lombok.Setter;
 public class Volunteer extends User {
 
   @Convert(converter = CpfConverter.class)
-  @Column(length = 11)
+  @Column(length = 255)
   private Cpf cpf;
 
  

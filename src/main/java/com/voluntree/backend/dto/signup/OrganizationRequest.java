@@ -7,9 +7,11 @@ import jakarta.validation.constraints.Size;
 
 public record OrganizationRequest(
 
+    @Size(max = 150)
     @NotBlank(message = "O nome não pode ser vazio")
     String name,
 
+    @Size(max = 255)
     @NotBlank
     @Email(message = "E-mail inválido")
     String email,
@@ -18,20 +20,26 @@ public record OrganizationRequest(
     @Pattern(regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W]).{8,}$", message = "Senha deve conter letras maiúsculas, minúsculas, simbolo e números")    
     String password,
 
+    @Size(max = 25)
     @NotBlank
     String phoneNumber,
 
+    @Size(min = 8, max = 8)
     @NotBlank
     String cep,
 
+    @Size(max = 10)
     @NotBlank
     String number,
 
+    @Size(max = 14)
     @NotBlank
     String cnpj,
 
+    @Size(max = 255)
     @NotBlank
     String companyName,
 
+    @Size(max = 1000)
     String cause
 ) {}

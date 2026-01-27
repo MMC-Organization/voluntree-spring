@@ -2,28 +2,31 @@
 package com.voluntree.backend.dto.user;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public record UpdateRequest(
     
-    @NotBlank(message = "O nome não pode estar vazio")
+    @Size(max = 150)
+    @NotEmpty(message = "O nome não pode ser vazio")
     String name,
 
-    @NotBlank
-    @Size(min = 10, max = 15) 
+    @Size(max = 255)
+    @NotEmpty
+    @Email(message = "E-mail inválido")
+    String email,
+    
+    @Size(max = 25)
+    @NotEmpty
     String phoneNumber,
 
-    @NotBlank
-    @Size(min = 8, max = 9)
+    @Size(min = 8, max = 8)
+    @NotEmpty
     String cep,
 
-    @NotBlank
-    String number,
-
-    @NotBlank
-    @Email(message = "O e-mail deve ser válido")
-    String email
+    @Size(max = 10)
+    @NotEmpty
+    String number
     
 ) {}
 

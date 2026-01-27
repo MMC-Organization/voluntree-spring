@@ -1,26 +1,15 @@
 package com.voluntree.backend.controller;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.voluntree.backend.domain.CustomUserDetails;
 import com.voluntree.backend.dto.auth.AuthenticationRequest;
 import com.voluntree.backend.dto.auth.AuthenticationResponse;
 import com.voluntree.backend.dto.auth.AuthenticationStatusResponse;
@@ -28,6 +17,7 @@ import com.voluntree.backend.dto.signup.OrganizationRequest;
 import com.voluntree.backend.dto.signup.OrganizationResponse;
 import com.voluntree.backend.dto.signup.VolunteerRequest;
 import com.voluntree.backend.dto.signup.VolunteerResponse;
+import com.voluntree.backend.service.AuthService;
 import com.voluntree.backend.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,44 +30,22 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
   private final UserService userService;
-  private final AuthenticationManager authManager;
-  private final SecurityContextRepository securityContextRepo;
-  private final SecurityContextHolderStrategy securityContextHolderStrat = SecurityContextHolder
-      .getContextHolderStrategy();
-  private final ApplicationEventPublisher eventPublisher;
+  private final AuthService authService;
 
   @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
-    Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
-    Authentication authResponse;
 
-    try {
-      authResponse = this.authManager.authenticate(authRequest);
-
-      eventPublisher.publishEvent(new AuthenticationSuccessEvent(authResponse));
-    } catch (AuthenticationException e) {
-      eventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(authRequest, e));
-      throw e;
-    }
-
-    SecurityContext context = securityContextHolderStrat.createEmptyContext();
-    context.setAuthentication(authResponse);
-    securityContextHolderStrat.setContext(context);
-    securityContextRepo.saveContext(context, request, response);
-
-    CustomUserDetails user = (CustomUserDetails) authResponse.getPrincipal();
-
-    return ResponseEntity.ok(new AuthenticationResponse(user.getUserId()));
+    Long userId = authService.authenticate(body, request, response);
+    return ResponseEntity.ok(new AuthenticationResponse(userId));
   }
 
   @GetMapping
   public ResponseEntity<AuthenticationStatusResponse> authStatus(Authentication auth) {
-    if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails))
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(new AuthenticationStatusResponse("Usuário não autenticado!", false));
-
-    return ResponseEntity.ok(new AuthenticationStatusResponse("Usuário autenticado!", true));
+    return authService.isAuthenticated(auth)
+        ? ResponseEntity.ok(new AuthenticationStatusResponse("Usuário autenticado!", true))
+        : ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new AuthenticationStatusResponse("Usuário não autenticado!", false));
   }
 
   @PostMapping(value = "/signup/volunteer", consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -40,4 +40,15 @@ public class LogService {
 
     logRepository.save(log);
   }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void saveAccessFailureLog(String message, Long userId, Long affectedResourceId, String affectedUserEmail, UserType userType,
+      ActionType actionType, Module module) {
+    Log log = new Log.Builder().message(message)
+        .userId(userId).affectedResourceId(affectedResourceId)
+        .userType(userType).actionType(actionType)
+        .outcome(Outcome.FAIL).module(module).build();
+
+    logRepository.save(log);
+  }
 }

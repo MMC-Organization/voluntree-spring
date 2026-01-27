@@ -75,6 +75,7 @@ CREATE TABLE
     message TEXT NOT NULL,
     user_id BIGINT,
     affected_resource_id BIGINT,
+    affected_user_email VARCHAR(255),
     user_type VARCHAR(30),
     action_type VARCHAR(30) NOT NULL,
     outcome VARCHAR(20) NOT NULL,

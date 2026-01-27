@@ -22,11 +22,13 @@ import lombok.Setter;
 @Setter
 public class Log {
 
-  public Log(String message, Long userId, Long affectedResourceId, UserType userType, ActionType actionType,
+  public Log(String message, Long userId, Long affectedResourceId, String affectedUserEmail, UserType userType,
+      ActionType actionType,
       Outcome outcome, Module module) {
     this.message = message;
     this.userId = userId;
     this.affectedResourceId = affectedResourceId;
+    this.affectedUserEmail = affectedUserEmail;
     this.userType = userType;
     this.actionType = actionType;
     this.outcome = outcome;
@@ -48,6 +50,9 @@ public class Log {
 
   @Column(updatable = false)
   private Long affectedResourceId;
+
+  @Column(updatable = false)
+  private String affectedUserEmail;
 
   @Column(updatable = false, length = 30)
   private UserType userType;

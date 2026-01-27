@@ -1,10 +1,11 @@
-package com.voluntree.backend.dto.profile;
+
+package com.voluntree.backend.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-public record UpdateProfileRequest(
+public record UpdateRequest(
     
     @Size(max = 150)
     @NotEmpty(message = "O nome não pode ser vazio")
@@ -26,5 +27,6 @@ public record UpdateProfileRequest(
     @Size(max = 10)
     @NotEmpty
     String number
+    
 ) {}
 

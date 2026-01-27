@@ -9,11 +9,11 @@ CREATE TABLE
     phone_number VARCHAR(25) NOT NULL,
     user_type VARCHAR(15) NOT NULL,
     -- Organization
-    cnpj VARCHAR(14) CHECK (cnpj ~ '^[0-9]{14}$'),
+    cnpj VARCHAR(255) ,
     company_name VARCHAR(255),
     cause TEXT,
     -- Volunteer
-    cpf VARCHAR(11) CHECK (cpf ~ '^[0-9]{11}$'),
+    cpf VARCHAR(255) ,
     -- Constraints
     CONSTRAINT unq_users_email UNIQUE (email),
     CONSTRAINT unq_users_phone_number UNIQUE (phone_number),

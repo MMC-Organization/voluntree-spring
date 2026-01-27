@@ -21,6 +21,8 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -45,7 +47,8 @@ public class SecurityConfig {
           }
         }))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/login","/api/auth/signup/volunteer","/api/auth/signup/organization").anonymous()
+            .requestMatchers("/api/auth/login", "/api/auth/signup/volunteer", "/api/auth/signup/organization")
+            .anonymous()
             .requestMatchers("/error", "/api/auth/**").permitAll()
             .anyRequest().authenticated())
         .logout(logout -> logout
@@ -78,5 +81,14 @@ public class SecurityConfig {
   @Bean
   AuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
     return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
+  }
+
+  @Bean
+  public CookieSerializer cookieSerializer() {
+    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    serializer.setUseHttpOnlyCookie(true);
+    serializer.setCookieMaxAge(60 * 60 * 8);
+    serializer.setSameSite("Strict");
+    return serializer;
   }
 }

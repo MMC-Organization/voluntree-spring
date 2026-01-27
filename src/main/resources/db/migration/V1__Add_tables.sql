@@ -73,6 +73,7 @@ CREATE TABLE
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     message TEXT NOT NULL,
+    user_ip VARCHAR,
     user_id BIGINT,
     affected_resource_id BIGINT,
     affected_user_email VARCHAR(255),

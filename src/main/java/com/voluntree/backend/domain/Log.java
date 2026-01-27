@@ -22,10 +22,12 @@ import lombok.Setter;
 @Setter
 public class Log {
 
-  public Log(String message, Long userId, Long affectedResourceId, String affectedUserEmail, UserType userType,
+  public Log(String message, String userIp, Long userId, Long affectedResourceId, String affectedUserEmail,
+      UserType userType,
       ActionType actionType,
       Outcome outcome, Module module) {
     this.message = message;
+    this.userIp = userIp;
     this.userId = userId;
     this.affectedResourceId = affectedResourceId;
     this.affectedUserEmail = affectedUserEmail;
@@ -44,6 +46,9 @@ public class Log {
 
   @Column(nullable = false, updatable = false)
   private String message;
+
+  @Column(nullable = false, updatable = false)
+  private String userIp;
 
   @Column(updatable = false)
   private Long userId;
@@ -68,8 +73,10 @@ public class Log {
 
   public static class Builder {
     private String message;
+    private String userIp;
     private Long userId;
     private Long affectedResourceId;
+    private String affectedUserEmail;
     private UserType userType;
     private ActionType actionType;
     private Outcome outcome;
@@ -80,6 +87,11 @@ public class Log {
       return this;
     }
 
+    public Builder userIp(String userIp) {
+      this.userIp = userIp;
+      return this;
+    }
+
     public Builder userId(Long userId) {
       this.userId = userId;
       return this;
@@ -87,6 +99,11 @@ public class Log {
 
     public Builder affectedResourceId(Long affectedResourceId) {
       this.affectedResourceId = affectedResourceId;
+      return this;
+    }
+
+    public Builder affectedUserEmail(String affectedUserEmail) {
+      this.affectedUserEmail = affectedUserEmail;
       return this;
     }
 
@@ -114,8 +131,10 @@ public class Log {
       Log log = new Log();
 
       log.setMessage(this.message);
+      log.setUserIp(this.userIp);
       log.setUserId(this.userId);
       log.setAffectedResourceId(this.affectedResourceId);
+      log.setAffectedUserEmail(this.affectedUserEmail);
       log.setUserType(this.userType);
       log.setActionType(this.actionType);
       log.setOutcome(this.outcome);

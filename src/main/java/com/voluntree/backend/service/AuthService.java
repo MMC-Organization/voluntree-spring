@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.voluntree.backend.domain.CustomUserDetails;
 import com.voluntree.backend.dto.auth.AuthenticationRequest;
+import com.voluntree.backend.dto.auth.AuthenticationStatusResponse;
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Module;
+import com.voluntree.backend.enums.UserType;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,7 +57,17 @@ public class AuthService {
     }
   }
 
-  public Boolean isAuthenticated(Authentication auth) {
-    return (auth != null && auth.getPrincipal() instanceof CustomUserDetails);
+  public AuthenticationStatusResponse isAuthenticated(Authentication auth) {
+    boolean status = false;
+    UserType userType = null;
+    String message = "Usuário não autenticado!";
+
+    if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+      status = true;
+      userType = ((CustomUserDetails) auth.getPrincipal()).getUserType();
+      message = "Usuário autenticado!";
+    }
+
+    return new AuthenticationStatusResponse(message, status, userType);
   }
 }

@@ -42,10 +42,13 @@ public class AuthController {
 
   @GetMapping
   public ResponseEntity<AuthenticationStatusResponse> authStatus(Authentication auth) {
-    return authService.isAuthenticated(auth)
-        ? ResponseEntity.ok(new AuthenticationStatusResponse("Usuário autenticado!", true))
-        : ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new AuthenticationStatusResponse("Usuário não autenticado!", false));
+    AuthenticationStatusResponse authState = authService.isAuthenticated(auth);
+
+    if (authState.status()) {
+      return ResponseEntity.ok(authState);
+    }
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authState);
   }
 
   @PostMapping("/signup/volunteer")

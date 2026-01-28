@@ -1,5 +1,7 @@
 package com.voluntree.backend.dto.auth;
 
-public record AuthenticationStatusResponse(String message, Boolean status) {
-  
+import com.voluntree.backend.enums.UserType;
+
+public record AuthenticationStatusResponse(String message, Boolean status, UserType userType) {
+
 }

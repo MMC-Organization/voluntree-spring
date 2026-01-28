@@ -39,7 +39,7 @@ public class UserService {
   public VolunteerResponse registerVolunteer(VolunteerRequest data) {
     try {
 
-      if (userRepository.existsByCpf(new Cpf(data.cpf()))) {
+      if (volunteerRepository.existsByCpf(new Cpf(data.cpf()))) {
         throw new IllegalArgumentException("Este CPF já está cadastrado.");
       }
 
@@ -72,7 +72,7 @@ public class UserService {
   @Transactional
   public OrganizationResponse registerOrganization(OrganizationRequest data) {
     try {
-      if (userRepository.existsByCnpj(new Cnpj(data.cnpj()))) {
+      if (organizationRepository.existsByCnpj(new Cnpj(data.cnpj()))) {
         throw new IllegalArgumentException("Este CNPJ já está cadastrado.");
       }
       Organization organization = new Organization();

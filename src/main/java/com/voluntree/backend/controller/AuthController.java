@@ -1,6 +1,7 @@
 package com.voluntree.backend.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class AuthController {
   private final UserService userService;
   private final AuthService authService;
 
-  @PostMapping("/login")
+  @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
 
@@ -51,7 +51,7 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authState);
   }
 
-  @PostMapping("/signup/volunteer")
+  @PostMapping(value = "/signup/volunteer", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<VolunteerResponse> signupVolunteer(@RequestBody @Valid VolunteerRequest dto) {
 
     VolunteerResponse response = userService.registerVolunteer(dto);
@@ -59,7 +59,7 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  @PostMapping("/signup/organization")
+  @PostMapping(value = "/signup/organization", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<OrganizationResponse> signupOrganization(@RequestBody @Valid OrganizationRequest dto) {
 
     OrganizationResponse response = userService.registerOrganization(dto);

@@ -38,6 +38,11 @@ public class UserService {
   @Transactional
   public VolunteerResponse registerVolunteer(VolunteerRequest data) {
     try {
+
+      if (volunteerRepository.existsByCpf(new Cpf(data.cpf()))) {
+        throw new IllegalArgumentException("Este CPF já está cadastrado.");
+      }
+
       Volunteer volunteer = new Volunteer();
 
       volunteer.setName(data.name());
@@ -47,6 +52,7 @@ public class UserService {
       volunteer.setCep(data.cep());
       volunteer.setNumber(data.number());
       volunteer.setCpf(new Cpf(data.cpf()));
+      
 
       Volunteer savedVolunteer = volunteerRepository.save(volunteer);
 
@@ -66,6 +72,9 @@ public class UserService {
   @Transactional
   public OrganizationResponse registerOrganization(OrganizationRequest data) {
     try {
+      if (organizationRepository.existsByCnpj(new Cnpj(data.cnpj()))) {
+        throw new IllegalArgumentException("Este CNPJ já está cadastrado.");
+      }
       Organization organization = new Organization();
 
       organization.setName(data.name());
@@ -109,11 +118,10 @@ public class UserService {
     String companyName = null;
     String cause = null;
 
-    // Trata dados de Voluntário
     if (user instanceof Volunteer v) {
       cpf = v.getCpf().getCpf();
     }
-    // Trata dados de Organização
+ 
     else if (user instanceof Organization org) {
       cnpj = org.getCnpj().getCnpj();
       companyName = org.getCompanyName();
@@ -141,8 +149,7 @@ public class UserService {
 
       String novoEmail = dto.email();
 
-      // Só verificamos se o e-mail já existe se o usuário estiver tentando mudar para
-      // um e-mail DIFERENTE do atual
+      
       if (!novoEmail.equals(user.getEmail())) {
         if (userRepository.existsByEmail(novoEmail)) {
           throw new RuntimeException("Este e-mail já está em uso por outro usuário");

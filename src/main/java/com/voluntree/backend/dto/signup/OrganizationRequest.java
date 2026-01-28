@@ -34,6 +34,7 @@ public record OrganizationRequest(
 
     @Size(max = 14)
     @NotBlank
+    @Pattern(regexp = "^\\d{14}$", message = "CNPJ deve conter apenas números")
     String cnpj,
 
     @Size(max = 255)

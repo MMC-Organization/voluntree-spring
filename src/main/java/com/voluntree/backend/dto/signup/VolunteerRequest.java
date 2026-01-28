@@ -34,5 +34,6 @@ public record VolunteerRequest(
 
     @Size(max = 11)
     @NotBlank
+    @Pattern(regexp = "^\\d{11}$", message = "CPF deve conter apenas números")
     String cpf
 ) {}

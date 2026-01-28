@@ -51,4 +51,9 @@ public class Cpf {
   public String getCpf() {
     return this.cpf;
   }
+
+  public String getMasked() {
+        if (cpf == null) return null;
+        return "***.***." + cpf.substring(6, 9) + "-" + cpf.substring(9);
+    }
 }

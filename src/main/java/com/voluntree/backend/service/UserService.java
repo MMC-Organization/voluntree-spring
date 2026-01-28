@@ -47,6 +47,7 @@ public class UserService {
       volunteer.setCep(data.cep());
       volunteer.setNumber(data.number());
       volunteer.setCpf(new Cpf(data.cpf()));
+      
 
       Volunteer savedVolunteer = volunteerRepository.save(volunteer);
 
@@ -109,11 +110,10 @@ public class UserService {
     String companyName = null;
     String cause = null;
 
-    // Trata dados de Voluntário
     if (user instanceof Volunteer v) {
       cpf = v.getCpf().getCpf();
     }
-    // Trata dados de Organização
+ 
     else if (user instanceof Organization org) {
       cnpj = org.getCnpj().getCnpj();
       companyName = org.getCompanyName();
@@ -141,8 +141,7 @@ public class UserService {
 
       String novoEmail = dto.email();
 
-      // Só verificamos se o e-mail já existe se o usuário estiver tentando mudar para
-      // um e-mail DIFERENTE do atual
+      
       if (!novoEmail.equals(user.getEmail())) {
         if (userRepository.existsByEmail(novoEmail)) {
           throw new RuntimeException("Este e-mail já está em uso por outro usuário");

@@ -7,9 +7,9 @@ import jakarta.persistence.AttributeConverter;
 public class CnpjConverter implements AttributeConverter<Cnpj, String> {
 
   @Override
-  public String convertToDatabaseColumn(Cnpj attribute) {
-    if (attribute == null) return null;
-        return CryptoUtils.encrypt(attribute.getCnpj());
+  public String convertToDatabaseColumn(Cnpj cnpj) {
+    if (cnpj == null) return null;
+        return CryptoUtils.encrypt(cnpj.getCnpj());  //
   }
 
   @Override

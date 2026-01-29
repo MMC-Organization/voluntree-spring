@@ -185,6 +185,12 @@ POST /api/auth/signup/organization
 
 ---
 
+**Nota:** Atualmente o backend não possui um endpoint de logout dedicado. Para encerrar a sessão do usuário, você pode:
+1. Deletar o cookie de sessão no frontend
+2. Implementar um endpoint `/api/auth/logout` no backend que invalide a sessão
+
+---
+
 ## Endpoints de Usuário
 
 ### 1. Obter Perfil do Usuário Autenticado
@@ -247,6 +253,26 @@ PUT /api/user/me
 ```
 
 **Response (204 No Content)**
+
+**Response (400 Bad Request):**
+```json
+{
+  "timestamp": "2026-01-29T13:00:00Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Erro de validação",
+  "errors": {
+    "email": "E-mail inválido",
+    "cep": "CEP deve conter 8 dígitos numéricos"
+  }
+}
+```
+
+**Possíveis Erros:**
+- Campos obrigatórios não preenchidos
+- E-mail com formato inválido
+- E-mail já está em uso por outro usuário
+- CEP com formato inválido
 
 ---
 
@@ -520,12 +546,14 @@ POST /api/registration/activity/{activityId}
 "Mensagem de erro específica"
 ```
 
-**Possíveis Erros:**
-- Atividade não encontrada
-- Atividade já ocorreu
-- Atividade cancelada
-- Sem vagas disponíveis
-- Já inscrito nesta atividade
+**Nota:** Os endpoints de inscrição retornam strings simples ao invés de objetos JSON estruturados.
+
+**Possíveis Mensagens de Erro:**
+- "Atividade não encontrada"
+- "Atividade já ocorreu"
+- "Atividade cancelada"
+- "Sem vagas disponíveis"
+- "Já inscrito nesta atividade"
 
 ---
 
@@ -687,11 +715,13 @@ Para produção, certifique-se de que o domínio do frontend está na lista de o
 
 ## Exemplos de Integração com Angular
 
+**Nota:** Os exemplos de serviços abaixo assumem que você configurou o interceptor `credentialsInterceptor` conforme mostrado na seção de configuração. Se você não usar o interceptor, adicione `{ withCredentials: true }` como terceiro parâmetro em todas as requisições.
+
 ### Serviço de Autenticação (auth.service.ts)
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -769,55 +799,91 @@ export class ActivityService {
 }
 ```
 
-### Interceptor HTTP para CSRF (csrf.interceptor.ts)
-
-```typescript
-import { Injectable } from '@angular/core';
-import {
-  HttpEvent,
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
-  HttpXsrfTokenExtractor
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-@Injectable()
-export class CsrfInterceptor implements HttpInterceptor {
-  constructor(private tokenExtractor: HttpXsrfTokenExtractor) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Adiciona o token CSRF para requisições que modificam dados
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-      const token = this.tokenExtractor.getToken();
-      if (token) {
-        req = req.clone({
-          setHeaders: {
-            'X-CSRF-TOKEN': token
-          }
-        });
-      }
-    }
-    return next.handle(req);
-  }
-}
-```
-
 ### Configuração do HttpClient (app.config.ts)
 
 ```typescript
 import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
-import { CsrfInterceptor } from './interceptors/csrf.interceptor';
+import { provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
+      withInterceptorsFromDi(),
       withXsrfConfiguration({
         cookieName: 'XSRF-TOKEN',
         headerName: 'X-CSRF-TOKEN'
-      }),
-      withInterceptors([CsrfInterceptor])
+      })
+    )
+  ]
+};
+```
+
+**Nota Importante:** A configuração `withXsrfConfiguration` automaticamente lida com o envio do token CSRF para todas as requisições que modificam dados (POST, PUT, PATCH, DELETE). Você não precisa criar um interceptor customizado para isso.
+
+### Configuração de withCredentials
+
+Para que as sessões funcionem corretamente (envio de cookies), configure `withCredentials: true` em todos os serviços que fazem requisições ao backend:
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = 'http://localhost:8080/api/auth';
+  private httpOptions = {
+    withCredentials: true  // Importante para enviar cookies de sessão
+  };
+
+  constructor(private http: HttpClient) {}
+
+  login(email: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { email, password }, this.httpOptions);
+  }
+
+  checkAuthStatus(): Observable<any> {
+    return this.http.get(`${this.apiUrl}`, this.httpOptions);
+  }
+
+  getCsrfToken(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/csrf`, this.httpOptions);
+  }
+}
+```
+
+Ou, alternativamente, crie um interceptor que adiciona `withCredentials` automaticamente a todas as requisições:
+
+```typescript
+import { HttpInterceptorFn } from '@angular/common/http';
+
+export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
+  // Adiciona withCredentials para todas as requisições ao backend
+  const modifiedReq = req.clone({
+    withCredentials: true
+  });
+  
+  return next(modifiedReq);
+};
+```
+
+E adicione-o na configuração:
+
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import { credentialsInterceptor } from './interceptors/credentials.interceptor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHttpClient(
+      withInterceptors([credentialsInterceptor]),
+      withXsrfConfiguration({
+        cookieName: 'XSRF-TOKEN',
+        headerName: 'X-CSRF-TOKEN'
+      })
     )
   ]
 };

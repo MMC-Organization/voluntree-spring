@@ -1,5 +1,5 @@
 package com.voluntree.backend.dto.auth;
 
-public record AuthenticationResponse(Long id) {
-
+public record AuthenticationResponse(Boolean authenticated, String message) {
+  
 }

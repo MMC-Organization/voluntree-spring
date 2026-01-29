@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -35,9 +36,13 @@ public class AuthController {
   @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
-
-    Long userId = authService.authenticate(body, request, response);
-    return ResponseEntity.ok(new AuthenticationResponse(userId));
+    try {
+      authService.authenticate(body, request, response);
+      return ResponseEntity.ok(new AuthenticationResponse(true, "Usuário autenticado com sucesso!"));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body(new AuthenticationResponse(false, "E-mail ou senha inválidos!"));
+    }
   }
 
   @GetMapping

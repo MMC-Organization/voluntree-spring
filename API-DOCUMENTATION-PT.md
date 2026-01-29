@@ -185,9 +185,7 @@ POST /api/auth/signup/organization
 
 ---
 
-**Nota:** Atualmente o backend não possui um endpoint de logout dedicado. Para encerrar a sessão do usuário, você pode:
-1. Deletar o cookie de sessão no frontend
-2. Implementar um endpoint `/api/auth/logout` no backend que invalide a sessão
+**Nota:** Atualmente o backend não possui um endpoint de logout dedicado. Recomenda-se implementar um endpoint `/api/auth/logout` no backend que invalide a sessão do usuário no Redis. Cookies de sessão são tipicamente marcados como HttpOnly por segurança, não podendo ser deletados pelo JavaScript do frontend.
 
 ---
 
@@ -546,7 +544,7 @@ POST /api/registration/activity/{activityId}
 "Mensagem de erro específica"
 ```
 
-**Nota:** Os endpoints de inscrição retornam strings simples ao invés de objetos JSON estruturados.
+**⚠️ Nota Importante sobre Formato de Resposta:** Os endpoints de inscrição (subscribe/unsubscribe) retornam strings simples ao invés de objetos JSON estruturados como a maioria dos outros endpoints da API. Esta inconsistência deve ser considerada ao implementar o tratamento de respostas no frontend. Você precisará tratar estas respostas de forma diferente dos outros endpoints.
 
 **Possíveis Mensagens de Erro:**
 - "Atividade não encontrada"
@@ -801,14 +799,39 @@ export class ActivityService {
 
 ### Configuração do HttpClient (app.config.ts)
 
+**Opção 1: Configuração básica (sem interceptor customizado)**
+
+Use esta opção se você preferir adicionar `withCredentials: true` manualmente em cada requisição nos seus serviços:
+
 ```typescript
 import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient, withInterceptorsFromDi, withXsrfConfiguration } from '@angular/common/http';
+import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(
-      withInterceptorsFromDi(),
+      withXsrfConfiguration({
+        cookieName: 'XSRF-TOKEN',
+        headerName: 'X-CSRF-TOKEN'
+      })
+    )
+  ]
+};
+```
+
+**Opção 2: Configuração com interceptor funcional (RECOMENDADO)**
+
+Use esta opção para adicionar `withCredentials: true` automaticamente em todas as requisições:
+
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
+import { credentialsInterceptor } from './interceptors/credentials.interceptor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHttpClient(
+      withInterceptors([credentialsInterceptor]),
       withXsrfConfiguration({
         cookieName: 'XSRF-TOKEN',
         headerName: 'X-CSRF-TOKEN'
@@ -822,7 +845,7 @@ export const appConfig: ApplicationConfig = {
 
 ### Configuração de withCredentials
 
-Para que as sessões funcionem corretamente (envio de cookies), configure `withCredentials: true` em todos os serviços que fazem requisições ao backend:
+**Se você escolheu a Opção 1**, configure `withCredentials: true` em todos os serviços:
 
 ```typescript
 import { Injectable } from '@angular/core';
@@ -854,9 +877,10 @@ export class AuthService {
 }
 ```
 
-Ou, alternativamente, crie um interceptor que adiciona `withCredentials` automaticamente a todas as requisições:
+**Se você escolheu a Opção 2 (RECOMENDADO)**, crie o interceptor funcional:
 
 ```typescript
+// src/app/interceptors/credentials.interceptor.ts
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
@@ -869,25 +893,7 @@ export const credentialsInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-E adicione-o na configuração:
-
-```typescript
-import { ApplicationConfig } from '@angular/core';
-import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
-import { credentialsInterceptor } from './interceptors/credentials.interceptor';
-
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideHttpClient(
-      withInterceptors([credentialsInterceptor]),
-      withXsrfConfiguration({
-        cookieName: 'XSRF-TOKEN',
-        headerName: 'X-CSRF-TOKEN'
-      })
-    )
-  ]
-};
-```
+Com esta abordagem, você não precisa adicionar `withCredentials` manualmente em cada requisição.
 
 ---
 

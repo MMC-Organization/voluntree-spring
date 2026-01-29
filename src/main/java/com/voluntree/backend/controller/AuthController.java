@@ -34,7 +34,7 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
+  public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
     try {
       authService.authenticate(body, request, response);

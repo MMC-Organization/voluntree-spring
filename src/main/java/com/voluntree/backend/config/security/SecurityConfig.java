@@ -33,7 +33,7 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, RlsInterceptor rlsInterceptor,
-      CustomLogoutSuccessHandler logoutSuccessHandler) throws Exception {
+      CustomLogoutSuccessHandler logoutSuccessHandler, CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
     http.csrf(csrf -> csrf
         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler() {
@@ -55,7 +55,8 @@ public class SecurityConfig {
             .logoutUrl("/api/auth/logout")
             .logoutSuccessHandler(logoutSuccessHandler))
         .formLogin(form -> form.disable())
-        .addFilterAfter(rlsInterceptor, UsernamePasswordAuthenticationFilter.class);
+        .addFilterAfter(rlsInterceptor, UsernamePasswordAuthenticationFilter.class)
+        .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler));
 
     return http.build();
   }

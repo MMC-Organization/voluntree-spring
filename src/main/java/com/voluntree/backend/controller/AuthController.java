@@ -34,16 +34,13 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest body,
+public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest body,
       HttpServletRequest request, HttpServletResponse response) {
-    try {
-      authService.authenticate(body, request, response);
-      return ResponseEntity.ok(new AuthenticationResponse(true, "Usuário autenticado com sucesso!"));
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-          .body(new AuthenticationResponse(false, "E-mail ou senha inválidos!"));
-    }
-  }
+
+    AuthenticationResponse authResponse = authService.authenticate(body, request, response);
+    
+    return ResponseEntity.ok(authResponse);
+}
 
   @GetMapping
   public ResponseEntity<AuthenticationStatusResponse> authStatus(Authentication auth) {

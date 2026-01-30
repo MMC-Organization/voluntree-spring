@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.voluntree.backend.domain.CustomUserDetails;
 import com.voluntree.backend.dto.auth.AuthenticationRequest;
+import com.voluntree.backend.dto.auth.AuthenticationResponse;
 import com.voluntree.backend.dto.auth.AuthenticationStatusResponse;
 import com.voluntree.backend.enums.ActionType;
 import com.voluntree.backend.enums.Module;
@@ -27,28 +28,34 @@ public class AuthService {
 
   private final LogService logService;
   private final AuthenticationManager authManager;
+  private final TokenService tokenService;
   private final SecurityContextRepository securityContextRepo;
   private final SecurityContextHolderStrategy securityContextHolderStrat = SecurityContextHolder
       .getContextHolderStrategy();
 
-  public Long authenticate(AuthenticationRequest body, HttpServletRequest request, HttpServletResponse response) {
+  public AuthenticationResponse authenticate(AuthenticationRequest body, HttpServletRequest request, HttpServletResponse response) {
     Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(body.email(), body.password());
     Authentication authResponse;
 
     try {
       authResponse = this.authManager.authenticate(authRequest);
 
-      SecurityContext context = securityContextHolderStrat.createEmptyContext();
-      context.setAuthentication(authResponse);
-      securityContextHolderStrat.setContext(context);
-      securityContextRepo.saveContext(context, request, response);
+      //SecurityContext context = securityContextHolderStrat.createEmptyContext();
+      //context.setAuthentication(authResponse);
+      //securityContextHolderStrat.setContext(context);
+      //securityContextRepo.saveContext(context, request, response);
 
       CustomUserDetails user = (CustomUserDetails) authResponse.getPrincipal();
-
+      String token = tokenService.generateToken(user);
       logService.saveSuccessLog("Houve um novo acesso!", null, user.getUserId(), user.getUserType(),
           ActionType.SIGNIN, Module.AUTH);
 
-      return user.getUserId();
+      return new AuthenticationResponse(
+          user.getUserId(),
+          token,
+          user.getUsername(), 
+          user.getUserType().toString()
+      );
     } catch (AuthenticationException e) {
       logService.saveAccessFailureLog("Houve uma nova tentativa de acesso (" + e.getMessage() + ")!", null, null,
           body.email(), null,

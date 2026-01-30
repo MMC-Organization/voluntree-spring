@@ -1,10 +1,9 @@
 package com.voluntree.backend.service;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.voluntree.backend.domain.CustomUserDetails;
-
+import com.auth0.jwt.JWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +12,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import static org.springframework.security.config.Elements.JWT;
-
-import io.lettuce.core.search.arguments.VectorFieldArgs.Algorithm;
 
 @Service
 public class TokenService {

@@ -178,10 +178,6 @@ public class ActivityService {
             "Você não tem permissão para deletar esta atividade");
       }
 
-      if (activity.getCanceled()) {
-        throw new IllegalStateException("Esta atividade já foi cancelada");
-      }
-
       // Soft delete: apenas marca como cancelada ao invés de deletar fisicamente
       activity.setCanceled(true);
       activityRepository.save(activity);
